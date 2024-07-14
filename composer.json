@@ -1,0 +1,19 @@
+{
+  "name": "alansim/php-attribute-router",
+  "description": "Router with php attributes",
+  "license": "GPL-3.0-or-later",
+  "authors": [
+    {
+      "name": "vladimirsimanov",
+      "email": "simanovv.dev@gmail.com"
+    }
+  ],
+  "autoload": {
+      "psr-4": {
+          "AttributeRouter\\": "src/"
+      }
+  },
+  "require": {
+    "psr/http-message": "^1.0"
+  }
+}
