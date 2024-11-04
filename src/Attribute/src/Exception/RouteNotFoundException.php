@@ -4,7 +4,7 @@ namespace AttributeRouter\Exception;
 
 use Exception;
 
-class RouteNotFoundException extends Exception
+final class RouteNotFoundException extends Exception
 {
 
 }

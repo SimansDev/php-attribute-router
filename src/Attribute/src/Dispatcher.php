@@ -1,6 +1,6 @@
 <?php
 
-namespace Practice\BaseStuff\core\Attribute\src;
+namespace AttributeRouter;
 
 use AttributeRouter\Attribute\Route;
 use AttributeRouter\Exception\RouteNotFoundException;
@@ -13,10 +13,14 @@ use Psr\Http\Message\UriInterface;
 use ReflectionClass;
 use ReflectionException;
 
-class Dispatcher
+final class Dispatcher
 {
     private static $routes;
 
+    /**
+     * @throws DirectoryEmptyException
+     * @throws NotConfiguredServiceException
+     */
     public function __construct(
         private string $controllersNamespaceRoot,
         private string $controllersPath,
@@ -42,7 +46,6 @@ class Dispatcher
 
 
     /**
-     * @throws ReflectionException
      * @throws DirectoryEmptyException
      * @throws NotConfiguredServiceException
      * @throws Exception
@@ -67,7 +70,6 @@ class Dispatcher
 
     /**
      * build routes collection
-     * @throws ReflectionException
      * @throws DirectoryEmptyException
      */
     private function collectRoutes(): void
