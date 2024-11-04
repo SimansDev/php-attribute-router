@@ -5,7 +5,7 @@ namespace AttributeRouter\Attribute;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_METHOD)]
-class Route
+final class Route
 {
     public function __construct(
         private readonly string $path,
