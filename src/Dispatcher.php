@@ -1,5 +1,7 @@
 <?php
 
+namespace AttributeRouter;
+
 use AttributeRouter\Attribute\Route;
 use AttributeRouter\DTO\RouteDto;
 use AttributeRouter\Exception\DirectoryEmptyException;
