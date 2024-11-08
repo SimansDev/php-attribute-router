@@ -1,17 +1,12 @@
 <?php
 
-namespace AttributeRouter;
-
 use AttributeRouter\Attribute\Route;
-use AttributeRouter\Exception\RouteNotFoundException;
 use AttributeRouter\DTO\RouteDto;
 use AttributeRouter\Exception\DirectoryEmptyException;
 use AttributeRouter\Exception\NotConfiguredServiceException;
-use Exception;
+use AttributeRouter\Exception\RouteNotFoundException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\UriInterface;
-use ReflectionClass;
-use ReflectionException;
 
 final class Dispatcher
 {
