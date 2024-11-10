@@ -34,12 +34,16 @@ final class Dispatcher
         $routes = $this->getRoutesCollection();
         $key = $this->getRoutesKey($request->getMethod(), $route->getPath());
         if (!key_exists($key, $routes)) {
-            if (str_contains($key, ':')) {
+            if (!str_contains($key, ':')) {
+                throw new RouteNotFoundException($key);
+            } else {
                 list($method, $route) = explode(':', $key);
-                $key = sprintf('[%s] %s', $method, $route);
+                throw new RouteNotFoundException(
+                    sprintf('[%s] %s', $method, $route)
+                );
             }
-            throw new RouteNotFoundException("Route {$key} Not Found");
         }
+
         list($class, $method) = explode('::', $routes[$key]);
         return new RouteDto(class: $class, method: $method, type: '');
     }
@@ -50,7 +54,7 @@ final class Dispatcher
      * @throws NotConfiguredServiceException
      * @throws Exception
      */
-    private function init()
+    private function init(): void
     {
         if (!$this->isControllerExist()) {
             throw new NotConfiguredServiceException(
@@ -58,7 +62,7 @@ final class Dispatcher
             );
         }
         $this->collectRoutes();
-        if (strlen($this->cachePath) === 0 && !is_dir($this->cachePath)) {
+        if (!is_file($this->cachePath) || filesize($this->cachePath) < 0) {
             $this->cacheRoutesCollection();
         }
     }
@@ -74,7 +78,7 @@ final class Dispatcher
      */
     private function collectRoutes(): void
     {
-        if (isset(self::$routes) and count(self::$routes) > 0) {
+        if (isset(self::$routes) && count(self::$routes) > 0) {
             return;
         }
         $files = scandir($this->controllersPath);
@@ -119,15 +123,27 @@ final class Dispatcher
     private function cacheRoutesCollection(): void
     {
         $cacheFileStream = fopen($this->cachePath, 'rb');
-        if ($cacheFileStream === false) {
+        if (file_exists($this->cachePath) && $cacheFileStream === false) {
             throw new Exception('Not able to open stream');
         }
+
         $routes = self::$routes;
-        $content = fread($cacheFileStream, filesize($this->cachePath));
-        fclose($cacheFileStream);
-        $data = json_decode($content, true);
-        $diff = array_diff($routes, $data);
-        if (count($diff) > 0) {
+        $hasToWrite = false;
+
+        if ($cacheFileStream !== false) {
+            $content = fread($cacheFileStream, filesize($this->cachePath));
+            fclose($cacheFileStream);
+            $data = json_decode($content, true);
+            $diff = array_diff($routes, $data);
+
+            if (count($diff) > 0) {
+                $hasToWrite = true;
+            }
+        } else {
+            $hasToWrite = true;
+        }
+
+        if ($hasToWrite) {
             $data = json_encode($routes);
             $cacheFileStream = fopen($this->cachePath, 'w+');
             fwrite($cacheFileStream, $data);
@@ -141,9 +157,9 @@ final class Dispatcher
         return self::$routes;
     }
 
-    private function isCachedRoutes()
+    private function isCachedRoutes(): bool
     {
-        return is_dir($this->cachePath);
+        return is_file($this->cachePath);
     }
 
     private function getCollectionRoutesFromCache(): array
